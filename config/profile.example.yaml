@@ -1,0 +1,33 @@
+# Copy to config/profile.yaml and write these in your own words.
+# The letter drafter only stitches together what you write here. It never invents facts.
+
+name: Your Name
+school: Purdue University
+majors: Computer Science and Finance
+graduation: May 2028
+email: you@example.com
+links:
+  github: https://github.com/your-handle
+
+# One or two sentences per resume variant, describing your strongest real work.
+pitch:
+  CSQNT: >
+    I built a live options analytics platform that prices contracts with Black Scholes,
+    solves implied volatility with Newton Raphson, and serves it through a web app.
+  FIN: >
+    Through my finance coursework and fellowship work I have built three statement models
+    and valuation analyses, and I manage the budget for a 100 member organization.
+
+# Why this kind of role, by family. Keep each to one sentence.
+why_family:
+  quant_research: I want to spend my days turning noisy data into decisions that can be tested.
+  quant_trading: I like problems where reasoning under uncertainty gets scored immediately.
+  quant_dev: I enjoy building the fast, correct systems that research depends on.
+  markets: I want to see how pricing and risk work on a real desk.
+  investment_banking: I want to learn how companies are valued and how deals come together.
+  private_equity: I want to understand what makes a business worth owning for years.
+  swe: I like shipping software that people rely on every day.
+  data_science: I enjoy building models and explaining what they actually say.
+  other: I am excited to contribute and learn quickly.
+
+closing: Thank you for your time and consideration.

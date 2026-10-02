@@ -1,0 +1,47 @@
+# Copy to config/settings.yaml and edit. settings.yaml is gitignored.
+
+candidate:
+  graduation_year: 2028
+  graduation_month: 5
+  degree_level: bachelors        # bachelors | masters | phd
+  needs_sponsorship: false
+
+targets:
+  seasons: ["summer 2027", "2027"]   # strings that signal the right internship cycle
+  locations: ["Chicago", "New York", "San Francisco", "Bay Area", "Remote", "United States", "Boston", "Austin"]
+  skip_companies: []
+  skip_title_keywords: ["phd", "senior", "staff", "principal", "director", "vice president", "experienced", "lead "]
+
+# Relative value of each role family to you, 0 to 1.
+# This is where your own prioritization framework lives.
+family_weights:
+  quant_research: 1.00
+  quant_trading: 0.95
+  quant_dev: 0.85
+  investment_banking: 0.70
+  private_equity: 0.70
+  markets: 0.75
+  swe: 0.65
+  data_science: 0.60
+  other: 0.10
+
+scoring:
+  freshness_half_life_days: 7    # postings fill fast; value halves every N days
+  intern_bonus: 1.0              # multiplier when the posting is clearly an internship
+  non_intern_penalty: 0.15       # multiplier for full time / graduate roles
+  wrong_cycle_penalty: 0.35      # posting names a different grad year or season
+  location_miss_penalty: 0.6
+  min_score_for_queue: 20
+
+resumes:
+  # Two resume variants. The router chooses between them per posting.
+  FIN:
+    path: resumes/ResumeFIN.pdf
+    label: Finance framed (corporate finance, Handshake fellowship first)
+  CSQNT:
+    path: resumes/ResumeCSQNT.pdf
+    label: Quant framed (VolEdge, Black Scholes, Newton Raphson, sklearn first)
+
+analytics:
+  ghost_after_days: 30           # no response after N days counts as ghosted
+  min_labels_for_classifier: 20  # router switches on the ML layer after this many applications

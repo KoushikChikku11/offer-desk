@@ -1,0 +1,33 @@
+# Firms to source from.
+#   ats:      greenhouse | lever | ashby | manual
+#   slug:     the board token in the ATS URL (boards.greenhouse.io/<slug>, jobs.lever.co/<slug>, jobs.ashbyhq.com/<slug>)
+#   tier:     1.0 = dream target, lower = still worth it
+#   verified: set by `offerdesk probe`. Unverified slugs are best guesses; run probe before trusting them.
+#
+# Firms on Workday or their own career sites go in as `manual`. Add their postings with
+# `offerdesk add` so they still flow through routing and analytics.
+
+firms:
+  - { name: IMC Trading,            ats: greenhouse, slug: imc,                tier: 1.00, verified: true }
+  - { name: DRW,                    ats: greenhouse, slug: drweng,             tier: 1.00, verified: false }
+  - { name: Hudson River Trading,   ats: greenhouse, slug: wehrtyou,           tier: 1.00, verified: false }
+  - { name: Akuna Capital,          ats: greenhouse, slug: akunacapital,       tier: 0.85, verified: false }
+  - { name: Five Rings,             ats: greenhouse, slug: fiveringsllc,       tier: 1.00, verified: false }
+  - { name: Jump Trading,           ats: greenhouse, slug: jumptrading,        tier: 1.00, verified: false }
+  - { name: Chicago Trading Company,ats: greenhouse, slug: chicagotradingcompany, tier: 0.90, verified: false }
+  - { name: Walleye Capital,        ats: greenhouse, slug: walleyecapital,     tier: 0.80, verified: false }
+  - { name: Flow Traders,           ats: greenhouse, slug: flowtraders,        tier: 0.85, verified: false }
+  - { name: Virtu Financial,        ats: greenhouse, slug: virtu,              tier: 0.80, verified: false }
+  - { name: Tower Research Capital, ats: greenhouse, slug: towerresearchcapital, tier: 0.95, verified: false }
+  - { name: Arrowstreet Capital,    ats: greenhouse, slug: arrowstreetcapital, tier: 0.85, verified: false }
+  - { name: Kalshi,                 ats: ashby,      slug: kalshi,             tier: 0.70, verified: false }
+  - { name: Ramp,                   ats: ashby,      slug: ramp,               tier: 0.60, verified: false }
+
+  # Own career sites or Workday. Track manually.
+  - { name: Citadel,                ats: manual, careers: https://www.citadel.com/careers/,       tier: 1.00 }
+  - { name: Jane Street,            ats: manual, careers: https://www.janestreet.com/join-jane-street/, tier: 1.00 }
+  - { name: Susquehanna (SIG),      ats: manual, careers: https://careers.sig.com/,               tier: 1.00 }
+  - { name: Optiver,                ats: manual, careers: https://optiver.com/working-at-optiver/career-opportunities/, tier: 1.00 }
+  - { name: AQR Capital,            ats: manual, careers: https://careers.aqr.com/,               tier: 0.95 }
+  - { name: Graham Partners,        ats: manual, careers: https://www.grahampartners.net/,        tier: 0.80 }
+  - { name: Macquarie,              ats: manual, careers: https://www.macquarie.com/careers,      tier: 0.80 }

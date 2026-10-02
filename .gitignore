@@ -1,0 +1,21 @@
+# Personal data never leaves your machine
+config/settings.yaml
+config/profile.yaml
+data/*.db
+data/*.db-journal
+resumes/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+build/
+dist/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
