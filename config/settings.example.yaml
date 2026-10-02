@@ -26,7 +26,8 @@ family_weights:
   other: 0.10
 
 scoring:
-  freshness_half_life_days: 7    # postings fill fast; value halves every N days
+  freshness_half_life_days: 7    # the freshness bonus halves every N days
+  freshness_floor: 0.75          # an old posting keeps this share of its score
   intern_bonus: 1.0              # multiplier when the posting is clearly an internship
   non_intern_penalty: 0.15       # multiplier for full time / graduate roles
   wrong_cycle_penalty: 0.35      # posting names a different grad year or season

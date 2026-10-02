@@ -67,3 +67,30 @@ def test_freshness_decays(cfg):
     fresh = Posting("F", "x", "1", "Quant Research Intern", published_at=NOW - timedelta(days=1))
     stale = Posting("F", "x", "2", "Quant Research Intern", published_at=NOW - timedelta(days=30))
     assert score_posting(fresh, cfg, now=NOW)[1] > score_posting(stale, cfg, now=NOW)[1]
+
+
+def test_support_roles_at_trading_firms_are_other():
+    for title in ["HR Intern", "Accounting Intern (Term-Time, Part-Time)", "Executive Assistant to the CEO",
+                  "Crypto Wallet Operations Specialist", "Risk Product Analyst", "Leadership Rotation Network Intern"]:
+        assert classify_family(title, "We are a leading proprietary trading firm.") == "other", title
+
+
+def test_quant_titles_without_standard_words():
+    assert classify_family("Quant Performance Engineer Intern - Summer 2027") == "quant_dev"
+    assert classify_family("Algorithm Development (Quant Research & Trading) Internship") == "quant_research"
+    assert classify_family("Campus Quantitative Researcher, UG/MS (Intern)") == "quant_research"
+
+
+def test_old_qr_intern_beats_fresh_hr_intern(cfg):
+    from datetime import timedelta
+
+    qr = Posting("F", "x", "1", "Quantitative Research Intern - Summer 2027", location="Chicago",
+                 published_at=NOW - timedelta(days=90))
+    hr = Posting("F", "x", "2", "HR Intern", location="Chicago", published_at=NOW - timedelta(days=1),
+                 description="A leading trading firm.")
+    assert score_posting(qr, cfg, now=NOW)[1] > 5 * score_posting(hr, cfg, now=NOW)[1]
+
+
+def test_off_season_programs_are_penalized(cfg):
+    winter = Posting("F", "x", "1", "Women in Trading and Technology Internship (WiTTI) – Winter 2027")
+    assert cycle_factor(winter, cfg)[0] == 0.35

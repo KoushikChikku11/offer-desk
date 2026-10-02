@@ -16,11 +16,21 @@ from datetime import datetime
 
 from .models import Posting, utcnow
 
+# Support functions that trading firms hire for. Checked first so "HR Intern" at a
+# trading firm is never mistaken for a trading role.
+NON_TARGET_RE = re.compile(
+    r"\b(hr|human resources|recruit\w*|talent|people (operations|partner)|accounting|accountant|payroll|tax"
+    r"|legal|counsel|paralegal|compliance|executive assistant|assistant to|office manager|facilities"
+    r"|administrative|marketing|communications|event|wallet operations|operations specialist"
+    r"|it support|help ?desk|procurement)\b",
+    re.I,
+)
+
 # Order matters: first match wins, most specific families first.
 FAMILY_PATTERNS: list[tuple[str, re.Pattern]] = [
     ("quant_research", re.compile(r"quant(itative)?\s*(research|researcher|analyst)|alpha research|research (intern|analyst)|machine learning research", re.I)),
     ("quant_trading", re.compile(r"\btrad(er|ing)\b|market mak", re.I)),
-    ("quant_dev", re.compile(r"quant(itative)?\s*(developer|dev|engineer)|trading systems|low latency|core developer|c\+\+", re.I)),
+    ("quant_dev", re.compile(r"quant(itative)?\s*(\w+\s+)?(developer|dev|engineer)|performance engineer|trading systems|low latency|core developer|c\+\+", re.I)),
     ("investment_banking", re.compile(r"investment bank|\bibd\b|m&a|mergers|advisory|corporate finance|leveraged finance|restructuring", re.I)),
     ("private_equity", re.compile(r"private equity|\bpe\b investment|buyout|growth equity", re.I)),
     ("markets", re.compile(r"sales (and|&) trading|global markets|\bmarkets\b|macro|commodit|structur(ed|ing)|rates|fixed income", re.I)),
@@ -31,19 +41,24 @@ FAMILY_PATTERNS: list[tuple[str, re.Pattern]] = [
 INTERN_RE = re.compile(r"\bintern(ship)?s?\b|summer analyst|co-?op\b", re.I)
 FULLTIME_RE = re.compile(r"\bgraduate\b|new grad|full[- ]time|\bexperienced\b|\bassociate\b", re.I)
 SUMMER_RE = re.compile(r"summer\s*(20\d\d)", re.I)
+OFF_SEASON_RE = re.compile(r"\b(winter|spring|fall|autumn|term[- ]time|part[- ]time|off[- ]cycle)\b", re.I)
 GRAD_YEAR_RE = re.compile(r"graduat\w*[^.;]{0,80}", re.I)
 YEAR_RE = re.compile(r"\b(20[2-3]\d)\b")
 
 
 def classify_family(title: str, description: str = "") -> str:
+    """Classify by title only.
+
+    Descriptions are not used: nearly every posting at a trading firm describes the
+    firm as a trading firm, which made HR and accounting roles look like trading roles.
+    """
+    if NON_TARGET_RE.search(title):
+        return "other"
     for family, pattern in FAMILY_PATTERNS:
         if pattern.search(title):
             return family
-    # Fall back to the first few hundred characters of the description.
-    head = description[:600]
-    for family, pattern in FAMILY_PATTERNS:
-        if pattern.search(head):
-            return family
+    if re.search(r"\bquant", title, re.I):
+        return "quant_research"
     return "other"
 
 
@@ -62,6 +77,10 @@ def cycle_factor(p: Posting, cfg: dict) -> tuple[float, str]:
     grad = int(cfg.get("candidate", {}).get("graduation_year", 2028))
     penalty = cfg.get("scoring", {}).get("wrong_cycle_penalty", 0.35)
     target_summer = grad - 1
+
+    off = OFF_SEASON_RE.search(p.title)
+    if off and not SUMMER_RE.search(p.title):
+        return penalty, f"{off.group(1).lower()} program, want summer {target_summer}"
 
     summer = SUMMER_RE.search(p.title)
     if summer:
@@ -94,10 +113,13 @@ def freshness_factor(published: datetime | None, cfg: dict, now: datetime | None
         return 0.8, None
     now = now or utcnow()
     days = max((now - published).total_seconds() / 86400, 0.0)
-    half_life = cfg.get("scoring", {}).get("freshness_half_life_days", 7)
+    s = cfg.get("scoring", {})
+    half_life = s.get("freshness_half_life_days", 7)
+    floor = s.get("freshness_floor", 0.75)
     decay = 0.5 ** (days / half_life)
-    # Floor at 0.4 so an old but perfect posting still shows up below fresh ones.
-    return 0.4 + 0.6 * decay, round(days, 1)
+    # Campus postings at quant firms often open in July and stay up for months, so age
+    # is a tiebreaker, not a dealbreaker. Fit to you should dominate the ranking.
+    return floor + (1 - floor) * decay, round(days, 1)
 
 
 def hard_skip(p: Posting, cfg: dict) -> str | None:
